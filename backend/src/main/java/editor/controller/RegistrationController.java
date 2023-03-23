@@ -4,10 +4,8 @@ import editor.dto.AuthRequest;
 import editor.entity.User;
 import editor.entity.VerificationToken;
 import editor.event.RegistrationCompleteEvent;
-import editor.service.EmailSenderService;
-import editor.service.JwtService;
-import editor.service.UserService;
-import editor.service.VerificationTokenService;
+import editor.model.PasswordModel;
+import editor.service.*;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +17,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import java.util.UUID;
 
 @RestController
 public class RegistrationController {
@@ -34,6 +33,8 @@ public class RegistrationController {
     private VerificationTokenService verificationTokenService;
     @Autowired
     private EmailSenderService emailSenderService;
+    @Autowired
+    private PasswordRestTokenService passwordRestTokenService;
 
     @GetMapping("/test")
     public String test() throws MessagingException {
@@ -80,6 +81,23 @@ public class RegistrationController {
         return "send";
     }
 
+    @PostMapping("/resetPassword")
+    public String resetPassword(@RequestBody PasswordModel passwordModel,HttpServletRequest httpServletRequest){
+        User user = userService.findUserByEmail(passwordModel.getEmail());
+        if(user != null){
+            String token = UUID.randomUUID().toString();
+            passwordRestTokenService.createPasswordRestTokenForUser(user,token);
+            restPasswordLink(
+                    token,
+                    user,
+                    applicationUrl(httpServletRequest)
+            );
+            return "send";
+        }else{
+            return "could not reset password";
+        }
+    }
+
     @PostMapping("/authenticate")
     public String authenticateAndGetToken(@RequestBody AuthRequest authRequest){
         Authentication authentication =
@@ -102,6 +120,17 @@ public class RegistrationController {
                 +":"
                 +httpServletRequest.getLocalPort()
                 +httpServletRequest.getContextPath();
+    }
+
+    private void restPasswordLink(String token, User user, String applicationUrl) {
+        String url = applicationUrl
+                +"/verifyRegistration?token="
+                +token;
+//        emailSenderService.sendSimpleEmail(
+//                user.getEmail(),
+//                "Click the link to rest your password",
+//                "Rest Password"
+//        );
     }
 
     private void resendVerifyTokenMail(String token, User user, String applicationUrl) {

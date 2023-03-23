@@ -6,4 +6,6 @@ import java.util.Map;
 
 public interface UserService {
     User registerUser(Map<String, String> requestParams);
+
+    User findUserByEmail(String email);
 }
