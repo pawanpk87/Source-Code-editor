@@ -17,6 +17,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -98,6 +99,32 @@ public class RegistrationController {
         }
     }
 
+    @PostMapping("/savePassword")
+    public String savePassword(@RequestParam("token") String token,@RequestBody PasswordModel passwordModel){
+        String result = passwordRestTokenService.validatePassword(token);
+        if(result == null || !result.equalsIgnoreCase("valid token")){
+            return result;
+        }else {
+            Optional<User> user = passwordRestTokenService.getUserByPasswordRestToken(token);
+            if(user.isPresent()){
+                userService.changePassword(user.get(),passwordModel.getNewPassword());
+                return "Password reset successfully";
+            }else{
+                return "invalid token";
+            }
+        }
+    }
+
+    @PostMapping("/changePassword")
+    public String changePassword(@RequestBody PasswordModel passwordModel){
+        User user = userService.findUserByEmail(passwordModel.getEmail());
+        if(user != null && userService.checkValidOldPassword(user,passwordModel.getOldPassword())){
+            userService.changePassword(user,passwordModel.getNewPassword());
+            return "Password changed successfully";
+        }
+        return "Invalid old password";
+    }
+
     @PostMapping("/authenticate")
     public String authenticateAndGetToken(@RequestBody AuthRequest authRequest){
         Authentication authentication =
@@ -124,7 +151,7 @@ public class RegistrationController {
 
     private void restPasswordLink(String token, User user, String applicationUrl) {
         String url = applicationUrl
-                +"/verifyRegistration?token="
+                +"/savePassword?token="
                 +token;
 //        emailSenderService.sendSimpleEmail(
 //                user.getEmail(),

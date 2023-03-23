@@ -8,4 +8,8 @@ public interface UserService {
     User registerUser(Map<String, String> requestParams);
 
     User findUserByEmail(String email);
+
+    void changePassword(User user, String newPassword);
+
+    boolean checkValidOldPassword(User user, String oldPassword);
 }
