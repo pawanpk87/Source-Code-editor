@@ -2,11 +2,14 @@ package editor.controller;
 
 import editor.dto.AuthRequest;
 import editor.entity.User;
-import editor.service.EmailSenderService;
+import editor.event.RegistrationCompleteEvent;
 import editor.service.JwtService;
 import editor.service.UserService;
+import editor.service.VerificationTokenService;
 import jakarta.mail.MessagingException;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -24,28 +27,44 @@ public class RegistrationController {
     @Autowired
     private JwtService jwtService;
     @Autowired
-    private EmailSenderService emailSenderService;
+    private ApplicationEventPublisher applicationEventPublisher;
+    @Autowired
+    private VerificationTokenService verificationTokenService;
 
     @GetMapping("/test")
     public String test() throws MessagingException {
-        emailSenderService.sendEmailWithAttachment(
-                "arowpk@gmail.com",
-                "Hii Pawan!",
-                "Testing",
-                "E:\\reports.txt"
-        );
         return "test";
     }
 
     @PostMapping("/register")
     public String registerUser(
-            @RequestBody Map<String,String> requestParams
+            @RequestBody Map<String,String> requestParams,
+            HttpServletRequest httpServletRequest
             ){
-        System.out.println(requestParams);
         User user = userService.registerUser(
                 requestParams
         );
+
+        applicationEventPublisher.publishEvent(
+                new RegistrationCompleteEvent(
+                        user,
+                        applicationUrl(httpServletRequest)
+                )
+        );
+
         return "success";
+    }
+
+    @GetMapping("/verifyRegistration")
+    public String verifyRegistration(@RequestParam("token") String token){
+        System.out.println("Got the request for verify");
+        String result = verificationTokenService.validateVerificationToken(token);
+        System.out.println(result);
+        if(result.equalsIgnoreCase("valid token")) {
+            return "User verified successfully";
+        }else{
+            return "Expired Token!!!";
+        }
     }
 
     @PostMapping("/authenticate")
@@ -62,5 +81,13 @@ public class RegistrationController {
         }else{
             throw new UsernameNotFoundException("User not found");
         }
+    }
+
+    private String applicationUrl(HttpServletRequest httpServletRequest) {
+        return "http:/"
+                +httpServletRequest.getServerName()
+                +":"
+                +httpServletRequest.getLocalPort()
+                +httpServletRequest.getContextPath();
     }
 }
