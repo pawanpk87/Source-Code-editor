@@ -2,8 +2,10 @@ package editor.controller;
 
 import editor.dto.AuthRequest;
 import editor.entity.User;
+import editor.service.EmailSenderService;
 import editor.service.JwtService;
 import editor.service.UserService;
+import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -21,9 +23,17 @@ public class RegistrationController {
     private AuthenticationManager authenticationManager;
     @Autowired
     private JwtService jwtService;
+    @Autowired
+    private EmailSenderService emailSenderService;
 
     @GetMapping("/test")
-    public String test(){
+    public String test() throws MessagingException {
+        emailSenderService.sendEmailWithAttachment(
+                "arowpk@gmail.com",
+                "Hii Pawan!",
+                "Testing",
+                "E:\\reports.txt"
+        );
         return "test";
     }
 
