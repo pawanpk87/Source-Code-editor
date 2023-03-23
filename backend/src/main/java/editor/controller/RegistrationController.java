@@ -2,7 +2,9 @@ package editor.controller;
 
 import editor.dto.AuthRequest;
 import editor.entity.User;
+import editor.entity.VerificationToken;
 import editor.event.RegistrationCompleteEvent;
+import editor.service.EmailSenderService;
 import editor.service.JwtService;
 import editor.service.UserService;
 import editor.service.VerificationTokenService;
@@ -30,6 +32,8 @@ public class RegistrationController {
     private ApplicationEventPublisher applicationEventPublisher;
     @Autowired
     private VerificationTokenService verificationTokenService;
+    @Autowired
+    private EmailSenderService emailSenderService;
 
     @GetMapping("/test")
     public String test() throws MessagingException {
@@ -45,12 +49,12 @@ public class RegistrationController {
                 requestParams
         );
 
-        applicationEventPublisher.publishEvent(
-                new RegistrationCompleteEvent(
-                        user,
-                        applicationUrl(httpServletRequest)
-                )
-        );
+//        applicationEventPublisher.publishEvent(
+//                new RegistrationCompleteEvent(
+//                        user,
+//                        applicationUrl(httpServletRequest)
+//                )
+//        );
 
         return "success";
     }
@@ -65,6 +69,15 @@ public class RegistrationController {
         }else{
             return "Expired Token!!!";
         }
+    }
+
+    @GetMapping("/resendVerifyToken")
+    public String resendVerifyToken(@RequestParam("token") String oldToken,HttpServletRequest httpServletRequest){
+        VerificationToken verificationToken =
+                verificationTokenService.generateNewVerificationToken(oldToken);
+        User user = verificationToken.getUser();
+        resendVerifyTokenMail(verificationToken.getToken(),user,applicationUrl(httpServletRequest));
+        return "send";
     }
 
     @PostMapping("/authenticate")
@@ -89,5 +102,16 @@ public class RegistrationController {
                 +":"
                 +httpServletRequest.getLocalPort()
                 +httpServletRequest.getContextPath();
+    }
+
+    private void resendVerifyTokenMail(String token, User user, String applicationUrl) {
+        String url = applicationUrl
+                +"/verifyRegistration?token="
+                +token;
+//        emailSenderService.sendSimpleEmail(
+//                user.getEmail(),
+//                "Click the link to verify your account",
+//                "Verify Registration"
+//        );
     }
 }
