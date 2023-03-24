@@ -27,26 +27,19 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
 
     @Override
     public String validateVerificationToken(String token) {
-        System.out.println("validateVerificationToken called...");
         VerificationToken verificationToken =
                 verificationTokenRepository.findByToken(token);
-        System.out.println(verificationToken);
         if(verificationToken == null){
             return "invalid token";
         }else{
             User user = verificationToken.getUser();
-            System.out.println("user");
-            System.out.println(user);
             Calendar calendar = Calendar.getInstance();
             if((verificationToken.getExpirationTime().getTime()
                - calendar.getTime().getTime()) <= 0){
                 return "expired";
             }
-            System.out.println("setEnabled");
             user.setEnabled(true);
-
             userRepository.save(user);
-
             return "valid token";
         }
     }

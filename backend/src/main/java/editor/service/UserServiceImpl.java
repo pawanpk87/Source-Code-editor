@@ -1,14 +1,19 @@
 package editor.service;
 
+import editor.dto.AuthRequest;
 import editor.entity.User;
-import editor.entity.VerificationToken;
 import editor.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseCookie;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.http.HttpHeaders;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class UserServiceImpl implements UserService{
@@ -17,6 +22,12 @@ public class UserServiceImpl implements UserService{
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private JwtService jwtService;
 
     @Override
     public User registerUser(Map<String, String> requestParams) {
@@ -48,5 +59,33 @@ public class UserServiceImpl implements UserService{
     @Override
     public boolean checkValidOldPassword(User user, String oldPassword) {
         return passwordEncoder.matches(oldPassword,user.getPassword());
+    }
+
+    @Override
+    public ResponseEntity<String>  authenticateUserAndGenerateAccessToken(AuthRequest authRequest, String accessToken) {
+        User user = userRepository.findByEmail(authRequest.getEmail())
+                .orElseThrow(()-> new IllegalArgumentException("User not found with email " + authRequest.getEmail()));
+        if(user != null && checkValidOldPassword(user,authRequest.getPassword())){
+            String email = authRequest.getEmail();
+            HttpHeaders responseHeaders  = new HttpHeaders();
+            if(accessToken == null){
+                accessToken = jwtService.generateToken(user.getEmail());
+            }
+            addAccessTokenCookie(responseHeaders,accessToken);
+            return ResponseEntity.ok().headers(responseHeaders).body("success");
+        }
+        else
+            return null;
+    }
+
+    private void addAccessTokenCookie(HttpHeaders responseHeaders, String token) {
+        Long duration = System.currentTimeMillis() + TimeUnit.HOURS.toMillis(24);
+        responseHeaders.add(HttpHeaders.SET_COOKIE,
+                String.valueOf(ResponseCookie.from("accessToken",token)
+                        .maxAge(duration)
+                        .httpOnly(true)
+                        .path("/")
+                        .build())
+                );
     }
 }

@@ -10,9 +10,11 @@ import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
@@ -63,9 +65,7 @@ public class RegistrationController {
 
     @GetMapping("/verifyRegistration")
     public String verifyRegistration(@RequestParam("token") String token){
-        System.out.println("Got the request for verify");
         String result = verificationTokenService.validateVerificationToken(token);
-        System.out.println(result);
         if(result.equalsIgnoreCase("valid token")) {
             return "User verified successfully";
         }else{
@@ -136,21 +136,19 @@ public class RegistrationController {
     }
 
     @PostMapping("/authenticate")
-    public String authenticateAndGetToken(@RequestBody AuthRequest authRequest){
-//        Authentication authentication =
-//                authenticationManager.authenticate(
-//                        new UsernamePasswordAuthenticationToken(
-//                                authRequest.getEmail(),
-//                                authRequest.getPassword()
-//                        )
-//                );
-//        System.out.println(authentication);
-//        if(authentication.isAuthenticated()) {
-//            return jwtService.generateToken(authRequest.getEmail());
-//        }else{
-//            throw new UsernameNotFoundException("User not found");
-//        }
-        return jwtService.generateToken(authRequest.getEmail());
+    public ResponseEntity<String> authenticateAndGetToken(
+            @RequestBody AuthRequest authRequest,
+            @CookieValue(name = "accessToken", required = false) String accessToken
+    ){
+        ResponseEntity<String>  response = null;
+        try{
+            response =  userService.authenticateUserAndGenerateAccessToken(authRequest,accessToken);
+            if(response == null)
+                return ResponseEntity.status(400).body("Password not match");
+        }catch (IllegalArgumentException exception){
+            return ResponseEntity.status(404).body("User not found with email " + authRequest.getEmail());
+        }
+        return response;
     }
 
     private String applicationUrl(HttpServletRequest httpServletRequest) {

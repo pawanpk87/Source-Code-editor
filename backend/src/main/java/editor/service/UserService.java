@@ -1,6 +1,8 @@
 package editor.service;
 
+import editor.dto.AuthRequest;
 import editor.entity.User;
+import org.springframework.http.ResponseEntity;
 
 import java.util.Map;
 
@@ -12,4 +14,6 @@ public interface UserService {
     void changePassword(User user, String newPassword);
 
     boolean checkValidOldPassword(User user, String oldPassword);
+
+    ResponseEntity<String> authenticateUserAndGenerateAccessToken(AuthRequest authRequest, String accessToken);
 }

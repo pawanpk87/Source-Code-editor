@@ -31,8 +31,6 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/register",
                                 "/authenticate",
-                                "/test",
-                                "/authenticate",
                                 "/verifyRegistration",
                                 "/resendVerifyToken",
                                 "/resetPassword",
@@ -43,6 +41,9 @@ public class SecurityConfig {
                 )
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .logout()
+                .deleteCookies("accessToken")
                 .and()
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();

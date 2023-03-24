@@ -22,21 +22,17 @@ public class RegistrationCompleteEventListener implements ApplicationListener<Re
 
     @Override
     public void onApplicationEvent(RegistrationCompleteEvent event) {
-        System.out.println("onApplicationEvent called...");
         User user = event.getUser();
         String token = UUID.randomUUID().toString();
         verificationTokenService.saveVerificationTokenForUser(token,user);
         String url = event.getApplicationURL()
                 +"/verifyRegistration?token="
                 +token;
-        System.out.println("saved verificationToken");
-        System.out.println("sending mail...");
         // send verification mail to user
         String toEmail = user.getEmail();
         String body = "Hello " +user.getFirstName() +" "+
                 "Click the link to verify your account <a href="+url+">link</a>";
         String subject = "Verify Registration";
-
         try {
             emailSenderService.sendEmailWithAttachment(
                     toEmail,

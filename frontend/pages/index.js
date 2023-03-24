@@ -1,3 +1,4 @@
+import SignIn from "@/components/DialogBox/SignIn";
 import Head from "next/head";
 
 export default function Home() {
@@ -10,9 +11,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        <button className="bg-blue-500 px-4 py-2 m-2 rounded-md shadow-md">
-          Register
-        </button>
+        <SignIn />
       </main>
     </>
   );

@@ -21,14 +21,11 @@ public class EmailSenderService {
     public void sendSimpleEmail(String toEmail,
                                 String body,
                                 String subject){
-        System.out.println("Got request for sending mail");
         SimpleMailMessage message = new SimpleMailMessage();
-
         message.setFrom("kpkumar.8757@gmail.com");
         message.setTo(toEmail);
         message.setText(body);
         message.setSubject(subject);
-
         javaMailSender.send(message);
     }
 
@@ -39,7 +36,6 @@ public class EmailSenderService {
         MimeMessage mimeMailMessage = javaMailSender.createMimeMessage();
         MimeMessageHelper mimeMessageHelper =
                 new MimeMessageHelper(mimeMailMessage,true);
-
         mimeMessageHelper.setFrom("kpkumar.8757@gmail.com");
         mimeMessageHelper.setTo(toEmail);
         mimeMessageHelper.setText(body,true);
