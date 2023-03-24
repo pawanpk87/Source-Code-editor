@@ -42,16 +42,16 @@ public class EmailSenderService {
 
         mimeMessageHelper.setFrom("kpkumar.8757@gmail.com");
         mimeMessageHelper.setTo(toEmail);
-        mimeMessageHelper.setText(body);
+        mimeMessageHelper.setText(body,true);
         mimeMessageHelper.setSubject(subject);
 
-        FileSystemResource fileSystemResource
-                = new FileSystemResource(new File(attachment));
-
-        mimeMessageHelper.addAttachment(
-                fileSystemResource.getFilename(),
-                fileSystemResource
-                );
+//        FileSystemResource fileSystemResource
+//                = new FileSystemResource(new File(attachment));
+//
+//        mimeMessageHelper.addAttachment(
+//                fileSystemResource.getFilename(),
+//                fileSystemResource
+//                );
 
         javaMailSender.send(mimeMailMessage);
     }

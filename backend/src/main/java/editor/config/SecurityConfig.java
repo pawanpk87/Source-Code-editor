@@ -28,14 +28,23 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf().disable()
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/register","/test","/authenticate","/verifyRegistration","/resendVerifyToken").permitAll()
+                        .requestMatchers(
+                                "/register",
+                                "/authenticate",
+                                "/test",
+                                "/authenticate",
+                                "/verifyRegistration",
+                                "/resendVerifyToken",
+                                "/resetPassword",
+                                "/savePassword",
+                                "/verifyResetPasswordToken"
+                        ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-                .httpBasic();
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
@@ -46,13 +55,11 @@ public class SecurityConfig {
 
     @Bean
     public UserDetailsService userDetailsService(){
-        System.out.println("AuthenticationManager called userDetailsService...");
         return new CustomUserDetailsService();
     }
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-        System.out.println("AuthenticationManager initiated");
         return config.getAuthenticationManager();
     }
 }

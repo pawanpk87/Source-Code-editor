@@ -4,10 +4,12 @@ import editor.entity.PasswordRestToken;
 import editor.entity.User;
 import editor.repository.PasswordRestTokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.Calendar;
 import java.util.Optional;
 
+@Service
 public class PasswordRestTokenServiceImpl implements  PasswordRestTokenService{
     @Autowired
     private PasswordRestTokenRepository passwordRestTokenRepository;

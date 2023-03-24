@@ -51,12 +51,12 @@ public class RegistrationController {
                 requestParams
         );
 
-//        applicationEventPublisher.publishEvent(
-//                new RegistrationCompleteEvent(
-//                        user,
-//                        applicationUrl(httpServletRequest)
-//                )
-//        );
+        applicationEventPublisher.publishEvent(
+                new RegistrationCompleteEvent(
+                        user,
+                        applicationUrl(httpServletRequest)
+                )
+        );
 
         return "success";
     }
@@ -74,7 +74,7 @@ public class RegistrationController {
     }
 
     @GetMapping("/resendVerifyToken")
-    public String resendVerifyToken(@RequestParam("token") String oldToken,HttpServletRequest httpServletRequest){
+    public String resendVerifyToken(@RequestParam("token") String oldToken,HttpServletRequest httpServletRequest) throws MessagingException {
         VerificationToken verificationToken =
                 verificationTokenService.generateNewVerificationToken(oldToken);
         User user = verificationToken.getUser();
@@ -82,9 +82,9 @@ public class RegistrationController {
         return "send";
     }
 
-    @PostMapping("/resetPassword")
-    public String resetPassword(@RequestBody PasswordModel passwordModel,HttpServletRequest httpServletRequest){
-        User user = userService.findUserByEmail(passwordModel.getEmail());
+    @GetMapping("/resetPassword")
+    public String resetPassword(@RequestParam("email") String email,HttpServletRequest httpServletRequest) throws MessagingException {
+        User user = userService.findUserByEmail(email);
         if(user != null){
             String token = UUID.randomUUID().toString();
             passwordRestTokenService.createPasswordRestTokenForUser(user,token);
@@ -95,7 +95,17 @@ public class RegistrationController {
             );
             return "send";
         }else{
-            return "could not reset password";
+            return "could not reset password (user not found)";
+        }
+    }
+
+    @GetMapping("/verifyResetPasswordToken")
+    public String savePassword(@RequestParam("token") String token){
+        String result = passwordRestTokenService.validatePassword(token);
+        if(result == null || !result.equalsIgnoreCase("valid token")){
+            return result;
+        }else {
+            return "valid token";
         }
     }
 
@@ -127,18 +137,20 @@ public class RegistrationController {
 
     @PostMapping("/authenticate")
     public String authenticateAndGetToken(@RequestBody AuthRequest authRequest){
-        Authentication authentication =
-                authenticationManager.authenticate(
-                        new UsernamePasswordAuthenticationToken(
-                                authRequest.getEmail(),
-                                authRequest.getPassword()
-                        )
-                );
-        if(authentication.isAuthenticated()) {
-            return jwtService.generateToken(authRequest.getEmail());
-        }else{
-            throw new UsernameNotFoundException("User not found");
-        }
+//        Authentication authentication =
+//                authenticationManager.authenticate(
+//                        new UsernamePasswordAuthenticationToken(
+//                                authRequest.getEmail(),
+//                                authRequest.getPassword()
+//                        )
+//                );
+//        System.out.println(authentication);
+//        if(authentication.isAuthenticated()) {
+//            return jwtService.generateToken(authRequest.getEmail());
+//        }else{
+//            throw new UsernameNotFoundException("User not found");
+//        }
+        return jwtService.generateToken(authRequest.getEmail());
     }
 
     private String applicationUrl(HttpServletRequest httpServletRequest) {
@@ -149,25 +161,27 @@ public class RegistrationController {
                 +httpServletRequest.getContextPath();
     }
 
-    private void restPasswordLink(String token, User user, String applicationUrl) {
+    private void restPasswordLink(String token, User user, String applicationUrl) throws MessagingException {
         String url = applicationUrl
                 +"/savePassword?token="
                 +token;
-//        emailSenderService.sendSimpleEmail(
-//                user.getEmail(),
-//                "Click the link to rest your password",
-//                "Rest Password"
-//        );
+        emailSenderService.sendEmailWithAttachment(
+                user.getEmail(),
+                "Click the link to rest your password <a href="+url+">link</a>",
+                "Rest Password",
+                null
+        );
     }
 
-    private void resendVerifyTokenMail(String token, User user, String applicationUrl) {
+    private void resendVerifyTokenMail(String token, User user, String applicationUrl) throws MessagingException {
         String url = applicationUrl
                 +"/verifyRegistration?token="
                 +token;
-//        emailSenderService.sendSimpleEmail(
-//                user.getEmail(),
-//                "Click the link to verify your account",
-//                "Verify Registration"
-//        );
+        emailSenderService.sendEmailWithAttachment(
+                user.getEmail(),
+                "Click the link to verify your account <a href="+url+">link</a>",
+                "Verify Registration",
+                null
+        );
     }
 }
