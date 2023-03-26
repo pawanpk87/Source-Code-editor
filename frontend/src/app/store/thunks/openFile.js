@@ -6,10 +6,8 @@ export const openFile = (TreeViewNode) => (dispatch, filesState) => {
     return;
   }
   const { activeFilesIds } = filesState;
-
   if (!activeFilesIds.includes(id)) {
     dispatch(addActiveFile(id));
   }
-
   dispatch(setEditorActiveFile(id));
 };

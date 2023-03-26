@@ -7,6 +7,8 @@ import SignInButton from "./SignInButton";
 import SignOutButton from "./SignOutButton";
 import { selectUser } from "@/src/app/store/slices/userSlice";
 import DarkModeSwitch from "./DarkModeSwitch";
+import { useRouter } from "next/router";
+import OpenWorkspaceButton from "./OpenWorkspaceButton";
 
 const StyledLink = styled(Link)(({ theme }) => ({
   textDecoration: "none",
@@ -36,12 +38,15 @@ const UnauthenticatedButtons = () => {
   );
 };
 
+const AuthenticatedButtonsContainer = styled("div")({ display: "flex" });
+
 const AuthenticatedButtons = () => {
+  const router = useRouter();
   return (
-    <div>
-      <CodeEditorButton />
+    <AuthenticatedButtonsContainer>
+      {router.pathname === "/" ? <CodeEditorButton /> : <OpenWorkspaceButton />}
       <SignOutButton />
-    </div>
+    </AuthenticatedButtonsContainer>
   );
 };
 
