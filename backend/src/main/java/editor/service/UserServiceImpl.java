@@ -72,6 +72,7 @@ public class UserServiceImpl implements UserService{
                 accessToken = jwtService.generateToken(user.getEmail());
             }
             addAccessTokenCookie(responseHeaders,accessToken);
+
             return ResponseEntity.ok().headers(responseHeaders).body("success");
         }
         else
@@ -84,8 +85,22 @@ public class UserServiceImpl implements UserService{
                 String.valueOf(ResponseCookie.from("accessToken",token)
                         .maxAge(duration)
                         .httpOnly(true)
+                        .sameSite("None")
+                        .secure(true)
                         .path("/")
                         .build())
                 );
+    }
+
+    @Override
+    public User getUserByCookie(String accessToken) {
+        String email = jwtService.extractUsername(accessToken);
+        if(email != null){
+            Optional<User> user = userRepository.findByEmail(email);
+            if(user.isPresent()){
+                return user.get();
+            }
+        }
+        return null;
     }
 }

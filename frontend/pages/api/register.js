@@ -7,6 +7,7 @@ export default async function handler(req, res) {
       method: "post",
       url: "http://localhost:8080/register",
       data: params,
+      withCredentials: true,
       headers: { "content-type": "application/json" },
     });
     const data = response.data;

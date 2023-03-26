@@ -7,7 +7,47 @@ import "primereact/resources/primereact.min.css";
 
 //icons
 import "primeicons/primeicons.css";
+import CustomThemeProvider from "@/styles/theme/CustomThemeProvider";
+import { Provider, useDispatch } from "react-redux";
+import { useEffect } from "react";
+import axios from "axios";
+import { isEmptyObject } from "@/util/UtilFuntion";
+import store from "@/src/app/store/store";
+import { setUser } from "@/src/app/store/slices/userSlice";
 
 export default function App({ Component, pageProps }) {
-  return <Component {...pageProps} />;
+  return (
+    <Provider store={store}>
+      <Auth>
+        <CustomThemeProvider>
+          <Component {...pageProps} />
+        </CustomThemeProvider>
+      </Auth>
+    </Provider>
+  );
 }
+
+const Auth = ({ children }) => {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await axios.get("api/user/login", {
+          withCredentials: true,
+        });
+        const data = response?.data;
+        if (data !== null && data !== undefined) {
+          if (isEmptyObject(data) === false) {
+            dispatch(setUser(data));
+          }
+        }
+      } catch (error) {
+        //do nothing
+      }
+    };
+    fetchUser();
+  }, []);
+
+  return children;
+};

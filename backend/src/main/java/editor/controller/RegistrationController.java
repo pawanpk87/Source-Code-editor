@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+@CrossOrigin(value = "http://localhost:3000/")
 @RestController
 public class RegistrationController {
     @Autowired
@@ -53,12 +54,12 @@ public class RegistrationController {
                 requestParams
         );
 
-        applicationEventPublisher.publishEvent(
-                new RegistrationCompleteEvent(
-                        user,
-                        applicationUrl(httpServletRequest)
-                )
-        );
+//        applicationEventPublisher.publishEvent(
+//                new RegistrationCompleteEvent(
+//                        user,
+//                        applicationUrl(httpServletRequest)
+//                )
+//        );
 
         return "success";
     }
@@ -78,7 +79,7 @@ public class RegistrationController {
         VerificationToken verificationToken =
                 verificationTokenService.generateNewVerificationToken(oldToken);
         User user = verificationToken.getUser();
-        resendVerifyTokenMail(verificationToken.getToken(),user,applicationUrl(httpServletRequest));
+        //resendVerifyTokenMail(verificationToken.getToken(),user,applicationUrl(httpServletRequest));
         return "send";
     }
 
@@ -88,11 +89,11 @@ public class RegistrationController {
         if(user != null){
             String token = UUID.randomUUID().toString();
             passwordRestTokenService.createPasswordRestTokenForUser(user,token);
-            restPasswordLink(
-                    token,
-                    user,
-                    applicationUrl(httpServletRequest)
-            );
+//            restPasswordLink(
+//                    token,
+//                    user,
+//                    applicationUrl(httpServletRequest)
+//            );
             return "send";
         }else{
             return "could not reset password (user not found)";

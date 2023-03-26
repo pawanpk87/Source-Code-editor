@@ -16,4 +16,6 @@ public interface UserService {
     boolean checkValidOldPassword(User user, String oldPassword);
 
     ResponseEntity<String> authenticateUserAndGenerateAccessToken(AuthRequest authRequest, String accessToken);
+
+    User getUserByCookie(String accessToken);
 }
