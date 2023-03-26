@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Toast } from "primereact/toast";
-import { getError, validateEmail } from "@/util/UtilFuntion";
+import { getError, validateEmail } from "@/util/UtilFuntions";
 import axios from "axios";
 import { useRouter } from "next/router";
 import { useDispatch } from "react-redux";
