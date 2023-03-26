@@ -42,4 +42,5 @@ export const {
   updateFileCode,
 } = filesSlice.actions;
 
+export const selectFilesState = (state) => state.files;
 export default filesSlice.reducer;
