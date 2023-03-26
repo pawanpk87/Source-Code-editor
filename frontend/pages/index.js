@@ -16,7 +16,7 @@ const HomeContainer = styled("div")(({ theme }) => ({
 const WelcomeMessage = styled("div")(({ theme }) => ({
   padding: "15px",
   fontSize: "30px",
-  color: "black",
+  color: theme.font,
 }));
 
 export default function Home() {

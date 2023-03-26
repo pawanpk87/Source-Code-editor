@@ -6,6 +6,7 @@ import CodeEditorButton from "./CodeEditorButton";
 import SignInButton from "./SignInButton";
 import SignOutButton from "./SignOutButton";
 import { selectUser } from "@/src/app/store/slices/userSlice";
+import DarkModeSwitch from "./DarkModeSwitch";
 
 const StyledLink = styled(Link)(({ theme }) => ({
   textDecoration: "none",
@@ -20,6 +21,7 @@ function Header() {
         <Typography variant="h6" sx={{ flex: 1 }}>
           <StyledLink href="/">Code Editor App</StyledLink>
         </Typography>
+        <DarkModeSwitch />
         {user ? <AuthenticatedButtons /> : <UnauthenticatedButtons />}
       </Toolbar>
     </AppBar>

@@ -12,17 +12,20 @@ import { Provider, useDispatch } from "react-redux";
 import { useEffect } from "react";
 import axios from "axios";
 import { isEmptyObject } from "@/util/UtilFuntion";
-import store from "@/src/app/store/store";
+import store, { persistor } from "@/src/app/store/store";
 import { setUser } from "@/src/app/store/slices/userSlice";
+import { PersistGate } from "redux-persist/integration/react";
 
 export default function App({ Component, pageProps }) {
   return (
     <Provider store={store}>
-      <Auth>
-        <CustomThemeProvider>
-          <Component {...pageProps} />
-        </CustomThemeProvider>
-      </Auth>
+      <PersistGate persistor={persistor}>
+        <Auth>
+          <CustomThemeProvider>
+            <Component {...pageProps} />
+          </CustomThemeProvider>
+        </Auth>
+      </PersistGate>
     </Provider>
   );
 }

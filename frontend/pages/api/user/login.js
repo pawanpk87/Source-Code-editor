@@ -33,8 +33,6 @@ export default async function handler(req, res) {
     const data = response.data;
     res.send(data);
   } catch (error) {
-    res.send({
-      message: error.response.data.message,
-    });
+    throw "error occured";
   }
 }

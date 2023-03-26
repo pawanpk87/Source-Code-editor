@@ -1,9 +1,11 @@
 import React from "react";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { commonColors, darkColors, lightColors } from "./colors";
+import { selectDarkMode } from "@/src/app/store/slices/darkModeSlice";
+import { useSelector } from "react-redux";
 
 function CustomThemeProvider({ children }) {
-  const darkMode = false;
+  const darkMode = useSelector(selectDarkMode);
 
   const theme = createTheme({
     palette: {
@@ -12,8 +14,8 @@ function CustomThemeProvider({ children }) {
         main: commonColors.primary,
       },
     },
-    backgroud: darkMode ? darkColors.background : lightColors.background,
-    font: darkColors ? darkColors.font : lightColors.font,
+    background: darkMode ? darkColors.background : lightColors.background,
+    font: darkMode ? darkColors.font : lightColors.font,
     commonColors,
   });
 
