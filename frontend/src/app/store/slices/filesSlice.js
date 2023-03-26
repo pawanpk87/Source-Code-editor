@@ -9,8 +9,6 @@ const filesSlice = createSlice({
   },
   reducers: {
     setFiles: (state, action) => {
-      console.log("setFiles called");
-      console.log("payload is:-");
       console.log(action.payload);
       state.userFiles = action.payload;
       state.activeFilesIds = [];

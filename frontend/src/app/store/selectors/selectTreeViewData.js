@@ -6,8 +6,6 @@ const selectTreeViewData = (userFiles) => {
   for (let i = 0; i < userFiles.length; i++) {
     const userFile = userFiles[i];
     const { name, relativePath, id, extension } = userFile;
-    console.log("relativePath is:-");
-    console.log(relativePath);
     const paths = relativePath.split("/");
     let j = 0;
     let currentLevel = result;

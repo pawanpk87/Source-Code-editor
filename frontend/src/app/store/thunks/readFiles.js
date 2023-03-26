@@ -11,8 +11,6 @@ export const readFiles = createAsyncThunk(
       promises.push(readFile(file));
     }
     const userFiles = await Promise.all(promises);
-    console.log("final userFiles is:-");
-    console.log(userFiles);
     dispatch(setFiles(userFiles));
   }
 );
