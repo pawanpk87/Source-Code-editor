@@ -1,6 +1,6 @@
 import { addActiveFile, setEditorActiveFile } from "../slices/filesSlice";
 
-export const openFile = (TreeViewNode) => (dispatch, filesState) => {
+export const openFile = (TreeViewNode, filesState) => (dispatch) => {
   const { id, children } = TreeViewNode;
   if (children) {
     return;

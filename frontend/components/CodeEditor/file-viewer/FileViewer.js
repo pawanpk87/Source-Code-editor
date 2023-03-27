@@ -6,17 +6,19 @@ import selectTreeViewData from "@/src/app/store/selectors/selectTreeViewData";
 import ExtensionIcon from "../extension-icon/ExtensionIcon";
 import { openFile } from "@/src/app/store/thunks/openFile";
 import { useDispatch, useSelector } from "react-redux";
+import { selectFilesState } from "@/src/app/store/slices/filesSlice";
 
 const EmptyMessage = styled("div")(({ theme }) => ({
   color: theme.font,
 }));
 
 function FileViewer() {
+  const filesState = useSelector(selectFilesState);
   const fileViewerData = useSelector(selectTreeViewData);
   const dispatch = useDispatch();
 
   const onSelectNode = (TreeViewNode) => {
-    dispatch(openFile(TreeViewNode));
+    dispatch(openFile(TreeViewNode, filesState));
   };
 
   const renderTree = (TreeViewNode) => {
@@ -26,7 +28,7 @@ function FileViewer() {
         key={id}
         nodeId={id}
         label={name}
-        onDoubleClick={() => onSelectNode(node)}
+        onDoubleClick={() => onSelectNode(TreeViewNode)}
         endIcon={<ExtensionIcon extension={extension} />}
         sx={{
           padding: "2px",

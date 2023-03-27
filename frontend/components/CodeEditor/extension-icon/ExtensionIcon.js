@@ -7,7 +7,7 @@ function ExtensionIcon(props) {
   };
 
   switch (props.extension) {
-    case "javascript":
+    case "js":
       return (
         <Image
           src={"/assets/javascript.svg"}

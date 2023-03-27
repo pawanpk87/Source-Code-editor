@@ -9,7 +9,6 @@ const filesSlice = createSlice({
   },
   reducers: {
     setFiles: (state, action) => {
-      console.log(action.payload);
       state.userFiles = action.payload;
       state.activeFilesIds = [];
     },
@@ -44,4 +43,7 @@ export const {
 } = filesSlice.actions;
 
 export const selectFilesState = (state) => state.files;
+export const selectActiveFiles = (state) => state.files.activeFilesIds;
+export const selectEditorActiveFileId = (state) =>
+  state.files.editorActiveField;
 export default filesSlice.reducer;

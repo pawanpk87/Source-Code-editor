@@ -1,6 +1,6 @@
 import { removeActiveFile, setEditorActiveFile } from "../slices/filesSlice";
 
-export const closeFile = (fileToCloseId) => (dispatch, filesState) => {
+export const closeFile = (fileToCloseId, filesState) => (dispatch) => {
   const { activeFilesIds, editorActiveField } = filesState;
   const activeFilesLength = activeFilesIds.length;
   if (activeFilesLength === 1) {
